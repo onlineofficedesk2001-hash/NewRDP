@@ -1,0 +1,23 @@
+name: Windows RDP
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 360
+
+    steps:
+      - name: Enable RDP
+        run: |
+          net user runneradmin Password123!
+          net localgroup administrators runneradmin /add
+          netsh advfirewall firewall set rule group="remote desktop" new enable=Yes
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -name "fDenyTSConnections" -value 0
+          Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+
+      - name: Keep Session Alive
+        run: |
+          echo "RDP is ready"
+          timeout 21600
